@@ -3,6 +3,9 @@
 var express    = require('express'),
     bodyParser = require('body-parser');
 
+// Require database
+require ('.db/database');
+
 // Controllers
 // =======================
 var responses = require('./controllers/responses');
@@ -22,3 +25,5 @@ app.use('/', responses);
 app.listen(3000, function() {
   console.log('The application is listening on Port 3000!');
 });
+
+

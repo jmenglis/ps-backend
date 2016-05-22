@@ -1,8 +1,8 @@
 var express   = require('express'),
     responses = express.Router(),
     Promise   = require('bluebird');
-    http      = require('http');
-
+    http      = require('http'),
+    DBSchema  = require('../models/schema');
 
 var promiseWhile = function(condition, action) {
   return new Promise(function(resolve, reject) {
@@ -18,12 +18,8 @@ var promiseWhile = function(condition, action) {
   });
 };
 
-
-
 var shuffledArray = [];
 var finalArray = [];
-
-
 var cardChoices = {
   1:"Ace of Hearts",
   2:"Two of Hearts",
@@ -78,10 +74,6 @@ var cardChoices = {
   51:"Queen of Spades",
   52:"King of Spades",
 }
-
-function Card(number) {
-}
-
 function isInArray(value, array) {
   return array.indexOf(value) > -1;
 }
@@ -91,7 +83,6 @@ function isInArray(value, array) {
 responses.get('/', function(req, res, next) {
   var deck = 52;
   var url1 = 'http://applicant.pointsource.us/api/random/573f5d0b7e3d61136595a182?min=1&max=52&num=1'
-
 promiseWhile(function() {
     return shuffledArray.length < deck;
   }, function() {
@@ -119,9 +110,8 @@ promiseWhile(function() {
       });
       var finalJson = {
         "deck": finalArray,
-        "length": finalArray.length
+        length: finalArray.length
       }
-      res.json(finalJson);
     // });
   });
 });
