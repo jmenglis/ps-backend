@@ -1,10 +1,11 @@
 // Require or dependencies
 // =======================
+require('dotenv').config();
 var express    = require('express'),
     bodyParser = require('body-parser');
 
 // Require database
-require ('.db/database');
+require ('./db/database');
 
 // Controllers
 // =======================

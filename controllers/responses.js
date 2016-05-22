@@ -1,9 +1,13 @@
+// Require Dependencies
+// ========================
 var express   = require('express'),
     responses = express.Router(),
     Promise   = require('bluebird');
     http      = require('http'),
-    DBSchema  = require('../models/schema');
+    DBSchema  = require('../model/schema');
 
+// Setup a Bluebird Promise loop to ensure the HTTP.GET is complete
+// ========================
 var promiseWhile = function(condition, action) {
   return new Promise(function(resolve, reject) {
     var loop = function() {
@@ -18,8 +22,8 @@ var promiseWhile = function(condition, action) {
   });
 };
 
-var shuffledArray = [];
-var finalArray = [];
+// Setup Card Selection for Each Card in a Deck
+// ========================
 var cardChoices = {
   1:"Ace of Hearts",
   2:"Two of Hearts",
@@ -74,45 +78,78 @@ var cardChoices = {
   51:"Queen of Spades",
   52:"King of Spades",
 }
+
+// Setup Function to Determine Cards in Array
+// ========================
 function isInArray(value, array) {
   return array.indexOf(value) > -1;
 }
 
 // Routes
 // ========================
+
+// Get Route to setup Shuffled Deck
+// ------------------------
 responses.get('/', function(req, res, next) {
+
+  var shuffledArray = [];
+  var finalArray = [];
   var deck = 52;
-  var url1 = 'http://applicant.pointsource.us/api/random/573f5d0b7e3d61136595a182?min=1&max=52&num=1'
+  var url = 'http://applicant.pointsource.us/api/random/573f5d0b7e3d61136595a182?min=1&max=52&num=1'
+
 promiseWhile(function() {
     return shuffledArray.length < deck;
   }, function() {
     return new Promise(function(resolve, reject) {
-      var request = http.get(url1, function(response) {
-        var rank;
+      var request = http.get(url, function(response) {
+        var card;
         var body = '';
         response.on('data', function(chunk) {
           body += chunk;
         });
         response.on('end', function() {
           var parsed = JSON.parse(body);
-          rank = parsed.numbers[0];
-          if (isInArray(rank, shuffledArray) === false) {
-            shuffledArray.push(rank);
+          card = parsed.numbers[0];
+          if (isInArray(card, shuffledArray) === false) {
+            shuffledArray.push(card);
           }
-          resolve(rank);
+          resolve(card);
         });
       });
     });
   }).then(function(){
-    // Promise.all(shuffledArray).then(function() {
-      shuffledArray.forEach(function(x) {
-        finalArray.push(cardChoices[x]);
-      });
-      var finalJson = {
-        "deck": finalArray,
-        length: finalArray.length
+    shuffledArray.forEach(function(x) {
+      finalArray.push(cardChoices[x]);
+    });
+    var storeInfo = {
+      finalDeck: finalArray,
+      length: finalArray.length
+    }
+    var myDeck = new DBSchema.Deck(storeInfo)
+    myDeck.save(function(err) {
+      if (err) {
+        return console.log(err);
+      } else {
+        res.json(storeInfo)
       }
-    // });
+    });
+  });
+});
+
+// Get Deck by using ID assigned by MongoDB
+// ------------------------
+responses.get('/:id', function(req, res, next) {
+  var id = req.params.id
+  DBSchema.Deck.find({_id: id}, function(err, deck) {
+    res.json(deck);
+  });
+});
+
+// Get All Created Decks from MongoDB
+// ------------------------
+responses.get('/getdecks', function(req, res, next){
+  DBSchema.Deck.find({}, function(err, deck) {
+    res.json(deck);
   });
 });
 
