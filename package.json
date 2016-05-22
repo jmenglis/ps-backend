@@ -9,6 +9,7 @@
   "author": "Josh English <josh@joshenglish.com>",
   "license": "MIT",
   "dependencies": {
+    "bluebird": "^3.4.0",
     "body-parser": "^1.15.1",
     "express": "^4.13.4"
   }
