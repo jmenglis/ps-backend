@@ -136,19 +136,20 @@ promiseWhile(function() {
   });
 });
 
-// Get Deck by using ID assigned by MongoDB
+
+// Get All Created Decks from MongoDB
 // ------------------------
-responses.get('/:id', function(req, res, next) {
-  var id = req.params.id
-  DBSchema.Deck.find({_id: id}, function(err, deck) {
+responses.get('/getdecks/', function(req, res, next) {
+  DBSchema.Deck.find({}, function(err, deck) {
     res.json(deck);
   });
 });
 
-// Get All Created Decks from MongoDB
+// Get Deck by using ID assigned by MongoDB
 // ------------------------
-responses.get('/getdecks', function(req, res, next){
-  DBSchema.Deck.find({}, function(err, deck) {
+responses.get('/:id', function(req, res, next) {
+  var id = req.params.id;
+  DBSchema.Deck.find({_id: id}, function(err, deck) {
     res.json(deck);
   });
 });

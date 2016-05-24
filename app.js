@@ -15,7 +15,7 @@ var responses = require('./controllers/responses');
 // =======================
 var app = express();
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Set Route for Controller
 // ========================
